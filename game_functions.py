@@ -14,10 +14,7 @@ def check_keydown_events(event, ai_settings, screen, ship, bullets):
         # 向左移动飞船
         ship.move_left = True
     elif event.key == pygame.K_SPACE:
-        # 创建一颗子弹，并将其加入到编组bullets中
-        if len(bullets) < ai_settings.bullets_allowed:  # 限制了发射子弹时，屏幕中只能有三颗子弹
-            new_bullet = Bullet(ai_settings, screen, ship)
-            bullets.add(new_bullet)
+        fire_bullet(ai_settings, screen, ship, bullets)
 
 
 def check_keyup_events(event, ship):
@@ -64,3 +61,10 @@ def update_bullets(bullets):
     3、深拷贝(deepcopy)： copy 模块的 deepcopy 方法，完全拷贝了父对象及其子对象。
     参考：https://www.runoob.com/w3cnote/python-understanding-dict-copy-shallow-or-deep.html
     """
+
+
+def fire_bullet(ai_settings, screen, ship, bullets):
+    # 创建一颗子弹，并将其加入到编组bullets中
+    if len(bullets) < ai_settings.bullets_allowed:  # 限制了发射子弹时，屏幕中只能有三颗子弹
+        new_bullet = Bullet(ai_settings, screen, ship)
+        bullets.add(new_bullet)
