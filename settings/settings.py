@@ -5,7 +5,7 @@ class Settings():
         """初始化游戏的设置"""
 
         # 屏幕设置
-        self.screen_with = 1100  # 屏幕的宽
+        self.screen_width = 1100  # 屏幕的宽
         self.screen_hight = 600  # 屏幕的高
         # 设置背景色
         """
@@ -26,4 +26,5 @@ class Settings():
         self.bullet_height = 15
         self.bullet_color = 60, 60, 60
         self.bullets_allowed = 3
+
 
