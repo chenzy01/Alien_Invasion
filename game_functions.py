@@ -2,6 +2,7 @@ import sys
 
 import pygame
 from bullet import Bullet
+from alien import Alien
 
 
 def check_keydown_events(event, ai_settings, screen, ship, bullets):
@@ -37,13 +38,14 @@ def check_events(ai_settings, screen, ship, bullets):
             check_keyup_events(event, ship)
 
 
-def update_screen(ai_settings, screen, ship, alien, bullets):
+def update_screen(ai_settings, screen, ship, aliens, bullets):
     """更新屏幕上的图像，并切换到新屏幕"""
     screen.fill(ai_settings.bg_color)
     for bullet in bullets.sprites():
         bullet.draw_bullet()
     ship.blitme()
-    alien.blitme()
+    # aliens.blitme()
+    aliens.draw(screen)  # 访问外星人编组，并绘制每个外星人
 
     # 让最近绘制的屏幕可见
     pygame.display.flip()  # 每次执行循环时都绘制一个空屏幕，并擦去旧屏幕
@@ -71,3 +73,31 @@ def fire_bullet(ai_settings, screen, ship, bullets):
     if len(bullets) < ai_settings.bullets_allowed:  # 限制了发射子弹时，屏幕中只能有三颗子弹
         new_bullet = Bullet(ai_settings, screen, ship)
         bullets.add(new_bullet)
+
+
+def create_fleet(ai_settings, screen, aliens):
+    """
+
+    :param ai_settings: 设置类的对象，获取外星人的属性
+    :param screen: 屏幕对象
+    :param aliens: 外星人编组
+    :return:
+    创建外星人群
+    创建一个外星人，并计算一行可以容纳多少外星人
+    外星人之间的间距是外星人图像的宽度
+    屏幕两边都留下间距，为外星人的宽度
+    """
+    alien = Alien(ai_settings, screen)
+    alien_width = alien.rect.width
+    avaible_space_x = ai_settings.screen_width - 2 * alien_width
+    number_aliens_x = int(avaible_space_x / (2 * alien_width))
+
+    # 创建第一行外星人
+    for alien_number in range(number_aliens_x):
+        # 创建一个外星人并将其加入当前行
+        alien = Alien(ai_settings, screen)
+        alien.x = alien_width + 2 * alien_width * alien_number
+        alien.rect.x = alien.x
+        aliens.add(alien)
+
+
