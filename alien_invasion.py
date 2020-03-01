@@ -13,7 +13,7 @@ def run_game():
     pygame.init()
     ai_settings = Settings()  # Settings() 是设置类
     # 创建一个显示窗口,宽1200,高800，是窗口大小，元组，这是整个游戏的窗口
-    screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_hight))
+    screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
     pygame.display.set_caption("Alien Invasion")  # 窗口的标题
 
     # 创建一艘飞船
@@ -26,7 +26,7 @@ def run_game():
     aliens = Group()
 
     # 创建外星人群
-    gf.create_fleet(ai_settings, screen, aliens)
+    gf.create_fleet(ai_settings, screen, ship, aliens)
 
 
 
