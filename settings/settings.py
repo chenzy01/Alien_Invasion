@@ -6,7 +6,7 @@ class Settings():
 
         # 屏幕设置
         self.screen_width = 1100  # 屏幕的宽
-        self.screen_hight = 600  # 屏幕的高
+        self.screen_height = 600  # 屏幕的高
         # 设置背景色
         """
         颜色是以RGB值指定，这种颜色由红色、绿色、蓝色值组成，其中每个值的取值范围都在 0~255.通
