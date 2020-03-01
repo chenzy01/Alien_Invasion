@@ -89,29 +89,69 @@ def get_number_aliens_x(ai_settings, alien_width):
     return number_aliens_x
 
 
-def create_alien(ai_settings, screen, aliens, alien_number):
+def get_number_rows(ai_settings, ship_height, alien_height):
+    """
+    :param ai_settings: 设置类的对象，获取外星人的属性
+    :param ship_height: 飞船的高度
+    :param alien_height:  外星人的高度
+    :return: 可容纳的行数
+    """
+    """计算屏幕可容纳多少行外星人"""
+    available_space_y = (ai_settings.screen_height - (3 * alien_height) - ship_height)  # 计算有多少可用的垂直空间
+    number_rows = int(available_space_y / (2 * alien_height))  # 计算可容纳的行数
+    return number_rows
+
+
+def create_alien(ai_settings, screen, aliens, alien_number, row_number):
+    """
+    :param ai_settings: 设置类的对象，获取外星人的属性
+    :param screen: 屏幕对象，为了获取屏幕的属性
+    :param aliens: 外星人编组，每生成一个，及加入到编组中
+    :param alien_number: 一行中，第 alien_number 个外星人
+    :param row_number: 垂直方向上，第 row_number 行的外星人，存储行号
+    :return:
+    """
     """创建一个外星人并将其放在当前行"""
     alien = Alien(ai_settings, screen)
-    alien_width = alien.rect.width
-    alien.x = alien_width + 2 * alien_width * alien_number
-    alien.rect.x = alien.x
+    alien_width = alien.rect.width  # 外星人的宽
+    alien.x = alien_width + 2 * alien_width * alien_number  # 外星人的X坐标
+    alien.rect.x = alien.x  # 一个外星人在一行上要占用的空间，包括最左边的间距，本身的宽度，外星人之间的间隔
+    alien.rect.y = alien.rect.height + 2 * alien.rect.height * row_number
     aliens.add(alien)
 
 
-def create_fleet(ai_settings, screen, aliens):
+def create_fleet(ai_settings, screen, ship, aliens):
     """
+    :param ship:  飞船对象，获取飞船属性
     :param ai_settings: 设置类的对象，获取外星人的属性
-    :param screen: 屏幕对象
+    :param screen: 屏幕对象，为了获取屏幕的属性
     :param aliens: 外星人编组
     创建外星人群
     创建一个外星人，并计算一行可以容纳多少外星人
     """
     alien = Alien(ai_settings, screen)
     number_aliens_x = get_number_aliens_x(ai_settings, alien.rect.width)
+    number_rows = get_number_rows(ai_settings, ship.rect.height, alien.rect.height)
 
-    # 创建第一行外星人
-    for alien_number in range(number_aliens_x):
-        # 创建一个外星人并将其加入当前行
-        create_alien(ai_settings, screen, aliens, alien_number)
+    # 创建外星人群
+    for row_number in range(number_rows):
+        for alien_number in range(number_aliens_x):
+            # 创建一个外星人并将其加入当前行
+            create_alien(ai_settings, screen, aliens, alien_number, row_number)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
