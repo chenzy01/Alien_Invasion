@@ -140,7 +140,9 @@ def create_fleet(ai_settings, screen, ship, aliens):
             create_alien(ai_settings, screen, aliens, alien_number, row_number)
 
 
-
+def update_aliens(aliens):
+    """更新外星人群中所有外星人的位置"""
+    aliens.update()
 
 
 
