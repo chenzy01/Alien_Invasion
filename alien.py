@@ -28,14 +28,15 @@ class Alien(Sprite):
 
     def check_edges(self):
         """如果外星人位于屏幕边缘，就返回True"""
-        screen_rect = self.screen.get_rect()
-        if self.rect.right >= screen_rect:
+        screen_rect = self.screen.get_rect()  # 获取屏幕的属性
+        if self.rect.right >= screen_rect.right:  # rect:外星人图像的对象,若外星人的right大于或等于屏幕的right，则位于屏幕右边缘
             return True
-        elif self.rect.left <= 0:
+        elif self.rect.left <= 0:  # 若外星人的left小于或等于屏幕的left，则位于屏幕左边缘
             return True
 
     def update(self):
         """向右或向左移动外星人"""
+        # 通过 fleet_direction 改变移动的方向，alien_speed_fector 是移动的速度
         self.x += (self.ai_settings.alien_speed_fector * self.ai_settings.fleet_direction)
         self.rect.x = self.x
 
