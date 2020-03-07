@@ -51,7 +51,7 @@ def update_screen(ai_settings, screen, ship, aliens, bullets):
     pygame.display.flip()  # 每次执行循环时都绘制一个空屏幕，并擦去旧屏幕
 
 
-def update_bullets(bullets):
+def update_bullets(ai_settings, screen, ship, aliens, bullets):
     """更新子弹的位置，并删除已消失的子弹"""
     bullets.update()  # 更新子弹位置
 
@@ -66,6 +66,17 @@ def update_bullets(bullets):
     3、深拷贝(deepcopy)： copy 模块的 deepcopy 方法，完全拷贝了父对象及其子对象。
     参考：https://www.runoob.com/w3cnote/python-understanding-dict-copy-shallow-or-deep.html
     """
+
+    """更新子弹的位置，并删除已消失的子弹"""
+    # 检查是否有子弹击中了外星人，是将每颗子弹的rect同外星人的rect进行比较
+    # 若击中，就删除相应的子弹和外星人
+    # sprite.groupcollide 返回的是一个字典{"子弹":"外星人"}
+    collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
+
+    if len(aliens) == 0:
+        # 当外星人为空时，清空子弹，并新建一群外星人
+        bullets.empty()
+        create_fleet(ai_settings, screen, ship, aliens)
 
 
 def fire_bullet(ai_settings, screen, ship, bullets):
@@ -148,7 +159,7 @@ def update_aliens(ai_settings, aliens):
 
 def check_fleet_edges(ai_settings, aliens):
     """有外星人到达边缘时采取相应的措施"""
-    for alien in aliens.sprites():
+    for alien in aliens.sprites():  # sprites在抽象类AbstractGroup中，Group()继承了AbstractGroup，aliens是Group()的对象
         if alien.check_edges():  # 返回了True，说明到达屏幕边缘
             change_fleet_direction(ai_settings, aliens)
             break
@@ -158,7 +169,7 @@ def change_fleet_direction(ai_settings, aliens):
     """将整群外星人下移，并改变它们的方向"""
     for alien in aliens.sprites():
         alien.rect.y += ai_settings.fleet_drop_speed   # 遍历所有外星人，将y坐标下移（增加，因为0坐标在左上角）
-    ai_settings.fleet_direction *= -1
+    ai_settings.fleet_direction *= -1  # 方向标志位
 
 
 
