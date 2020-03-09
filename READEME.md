@@ -93,8 +93,48 @@ create_alien()两个函数。前一个把上个计算公式抽离出来，获取
 self.rect.right >= screen_rect.right，通过right这个属性的比较，就能知道是否达到边缘，但是通过源码追踪，无法知道right
 是如何来的。这些移动的过程，比较难的地方是否要把它们连贯起来，各个小动作要拆开用小函数明确的表示，然后各自调用，传入的
 参数要注意它的作用。
+***
+#### 20200309 周日  
 
+周六通过一个函数 pygame.sprite.groupcollide()，用来检测子弹与外星人的碰撞。groupcollide()的实现原理是遍历bullets和
+aliens两个编组中的每一个元素，检查每个元素的坐标，若发现坐标一致的元素，就判断子弹和外星人重叠了，也就是碰撞到了。
+groupcollide()返回一个字典，当碰撞到时，把对应的子弹和外星人加入字典中。而原来的子弹和外星人，则删除碰撞后的子弹和外星人。  
+里面还需注意一个，当子弹击中外星人，子弹应该也是同时消失，而不是继续穿行到屏幕顶部，所以groupcollide()中的两个布尔值
+都设置为True才合理。
+```python
+def groupcollide(groupa, groupb, dokilla, dokillb, collided=None):
+    """detect collision between a group and another group
 
+    pygame.sprite.groupcollide(groupa, groupb, dokilla, dokillb):
+        return dict
+
+    Given two groups, this will find the intersections between all sprites in
+    each group. It returns a dictionary of all sprites in the first group that
+    collide. The value for each item in the dictionary is a list of the sprites
+    in the second group it collides with. The two dokill arguments control if
+    the sprites from either group will be automatically removed from all
+    groups. Collided is a callback function used to calculate if two sprites
+    are colliding. it should take two sprites as values, and return a bool
+    value indicating if they are colliding. If collided is not passed, all
+    sprites must have a "rect" value, which is a rectangle of the sprite area
+    that will be used to calculate the collision.
+
+    """
+    crashed = {}
+    SC = spritecollide
+    if dokilla:
+        for s in groupa.sprites():
+            c = SC(s, groupb, dokillb, collided)
+            if c:
+                crashed[s] = c
+                s.kill()
+    else:
+        for s in groupa:
+            c = SC(s, groupb, dokillb, collided)
+            if c:
+                crashed[s] = c
+    return crashed
+```
  
 
 
