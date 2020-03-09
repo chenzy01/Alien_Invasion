@@ -66,7 +66,11 @@ def update_bullets(ai_settings, screen, ship, aliens, bullets):
     3、深拷贝(deepcopy)： copy 模块的 deepcopy 方法，完全拷贝了父对象及其子对象。
     参考：https://www.runoob.com/w3cnote/python-understanding-dict-copy-shallow-or-deep.html
     """
+    # 检查子弹与外星人的碰撞
+    check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets)
 
+
+def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets):
     """更新子弹的位置，并删除已消失的子弹"""
     # 检查是否有子弹击中了外星人，是将每颗子弹的rect同外星人的rect进行比较
     # 若击中，就删除相应的子弹和外星人
@@ -151,10 +155,15 @@ def create_fleet(ai_settings, screen, ship, aliens):
             create_alien(ai_settings, screen, aliens, alien_number, row_number)
 
 
-def update_aliens(ai_settings, aliens):
+def update_aliens(ai_settings, ship, aliens):
     """检查是否有外星人处于屏幕边缘，更新外星人群中所有外星人的位置"""
     check_fleet_edges(ai_settings, aliens)
     aliens.update()
+
+    # 检查外星人和飞船之间的碰撞
+    # spritecollideany()函数接受一个精灵和一个编组，遍历编组，找与精灵碰撞的成员，找到就返回该成员，找不到返回None
+    if pygame.sprite.spritecollideany(ship, aliens):
+        print("Ship hit!!! GAME OVER")
 
 
 def check_fleet_edges(ai_settings, aliens):
