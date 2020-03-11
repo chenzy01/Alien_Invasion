@@ -19,6 +19,7 @@ class Settings():
 
         # 飞船的位置
         self.ship_speed_factor = 1.5
+        self.ship_limit = 3
 
         # 子弹设置:速度，宽，高，颜色
         self.bullet_speed_factor = 3
@@ -29,7 +30,7 @@ class Settings():
 
         # 外星人设置
         self.alien_speed_fector = 1  # 移动的速度
-        self.fleet_drop_speed = 10  # 向下移动的速度
+        self.fleet_drop_speed = 30  # 向下移动的速度
         # fleet_direction为1表示向右，-1表示向左
         self.fleet_direction = 1
 
