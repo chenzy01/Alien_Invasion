@@ -1,4 +1,5 @@
 import sys
+from time import sleep
 
 import pygame
 from bullet import Bullet
@@ -155,7 +156,7 @@ def create_fleet(ai_settings, screen, ship, aliens):
             create_alien(ai_settings, screen, aliens, alien_number, row_number)
 
 
-def update_aliens(ai_settings, ship, aliens):
+def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
     """检查是否有外星人处于屏幕边缘，更新外星人群中所有外星人的位置"""
     check_fleet_edges(ai_settings, aliens)
     aliens.update()
@@ -163,7 +164,10 @@ def update_aliens(ai_settings, ship, aliens):
     # 检查外星人和飞船之间的碰撞
     # spritecollideany()函数接受一个精灵和一个编组，遍历编组，找与精灵碰撞的成员，找到就返回该成员，找不到返回None
     if pygame.sprite.spritecollideany(ship, aliens):
-        print("Ship hit!!! GAME OVER")
+        # print("Ship hit!!! GAME OVER")
+        ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+    # 检查是否有外星人到达屏幕底端
+    check_aliens_bollom(ai_settings, stats, screen, ship, aliens, bullets)
 
 
 def check_fleet_edges(ai_settings, aliens):
@@ -179,6 +183,34 @@ def change_fleet_direction(ai_settings, aliens):
     for alien in aliens.sprites():
         alien.rect.y += ai_settings.fleet_drop_speed   # 遍历所有外星人，将y坐标下移（增加，因为0坐标在左上角）
     ai_settings.fleet_direction *= -1  # 方向标志位
+
+
+def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
+    """相应被外星人撞到的飞船"""
+    # 将 ships_left 的值减1
+    stats.ships_left -= 1
+
+    # 清空外星人列表和子弹列表
+    aliens.empty()
+    bullets.empty()
+
+    # 创建一群新的外星人，并将飞船放置到屏幕中央底部
+    create_fleet(ai_settings, screen, ship, aliens)
+    ship.center_ship()
+
+    # 暂停
+    sleep(0.5)
+
+
+def check_aliens_bollom(ai_settings, stats, screen, ship, aliens, bullets):
+    """检查是否有外星人到达了屏幕底端"""
+    screen_rect = screen.get_rect()
+    for alien in aliens.sprites():
+        if alien.rect.bottom >= screen_rect.bottom:
+            # 像飞船被撞到一样进行处理
+            ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+            break
+
 
 
 
