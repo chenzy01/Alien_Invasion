@@ -167,7 +167,7 @@ def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
         # print("Ship hit!!! GAME OVER")
         ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
     # 检查是否有外星人到达屏幕底端
-    check_aliens_bollom(ai_settings, stats, screen, ship, aliens, bullets)
+    check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets)
 
 
 def check_fleet_edges(ai_settings, aliens):
@@ -186,23 +186,23 @@ def change_fleet_direction(ai_settings, aliens):
 
 
 def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
-    """相应被外星人撞到的飞船"""
-    # 将 ships_left 的值减1
-    stats.ships_left -= 1
+    """响应被外星人撞到的飞船"""
+    if stats.ships_left >0:
+        # 将 ships_left 的值减1
+        stats.ships_left -= 1
+        # 清空外星人列表和子弹列表
+        aliens.empty()
+        bullets.empty()
+        # 创建一群新的外星人，并将飞船放置到屏幕中央底部
+        create_fleet(ai_settings, screen, ship, aliens)
+        ship.center_ship()
+        # 暂停
+        sleep(0.5)
+    else:
+        stats.game_active = False
 
-    # 清空外星人列表和子弹列表
-    aliens.empty()
-    bullets.empty()
 
-    # 创建一群新的外星人，并将飞船放置到屏幕中央底部
-    create_fleet(ai_settings, screen, ship, aliens)
-    ship.center_ship()
-
-    # 暂停
-    sleep(0.5)
-
-
-def check_aliens_bollom(ai_settings, stats, screen, ship, aliens, bullets):
+def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
     """检查是否有外星人到达了屏幕底端"""
     screen_rect = screen.get_rect()
     for alien in aliens.sprites():
