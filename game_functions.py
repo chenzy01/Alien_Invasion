@@ -28,7 +28,7 @@ def check_keyup_events(event, ship):
         ship.move_left = False
 
 
-def check_events(ai_settings, screen, ship, bullets):
+def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets):
     # 监视键盘和鼠标事件
     for event in pygame.event.get():  # 事件循环，来管理屏幕更新的代码
         if event.type == pygame.QUIT:
@@ -37,9 +37,33 @@ def check_events(ai_settings, screen, ship, bullets):
             check_keydown_events(event, ai_settings, screen, ship, bullets)
         elif event.type == pygame.KEYUP:
             check_keyup_events(event, ship)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = pygame.mouse.get_pos()  # 返回一个元组，包含玩家单机时鼠标的x和y坐标
+            check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y)
 
 
-def update_screen(ai_settings, screen, ship, aliens, bullets):
+def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y):
+    """在玩家点击 Play 按钮时开始游戏"""
+    if play_button.rect.collidepoint(mouse_x, mouse_y):  # 检查点击时鼠标的坐标是否落在Play按钮rect内
+        button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
+        # 仅当玩家单击了 Play 按钮且游戏当前处于非活跃状态时，游戏才重新开始
+        if button_clicked and not stats.game_active:
+            # 影藏光标
+            pygame.mouse.set_visible(False)
+            # 重置游戏统计信息
+            stats.reset_stats()
+            stats.game_active = True
+
+            # 清空外星人和子弹列表
+            aliens.empty()
+            bullets.empty()
+
+            # 创建一群新的外星人，并让飞船居中
+            create_fleet(ai_settings, screen, ship, aliens)
+            ship.center_ship()
+
+
+def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button):
     """更新屏幕上的图像，并切换到新屏幕"""
     screen.fill(ai_settings.bg_color)
     for bullet in bullets.sprites():
@@ -47,6 +71,10 @@ def update_screen(ai_settings, screen, ship, aliens, bullets):
     ship.blitme()
     # aliens.blitme()
     aliens.draw(screen)  # 访问外星人编组，并绘制每个外星人
+
+    # 如果游戏处于非活动状态，就绘制 Play 按钮
+    if not stats.game_active:
+        play_button.draw_button()
 
     # 让最近绘制的屏幕可见
     pygame.display.flip()  # 每次执行循环时都绘制一个空屏幕，并擦去旧屏幕
@@ -187,7 +215,7 @@ def change_fleet_direction(ai_settings, aliens):
 
 def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
     """响应被外星人撞到的飞船"""
-    if stats.ships_left >0:
+    if stats.ships_left > 0:
         # 将 ships_left 的值减1
         stats.ships_left -= 1
         # 清空外星人列表和子弹列表
@@ -200,6 +228,7 @@ def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
         sleep(0.5)
     else:
         stats.game_active = False
+        pygame.mouse.set_visible(True)
 
 
 def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
