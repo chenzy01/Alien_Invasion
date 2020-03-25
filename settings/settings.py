@@ -29,7 +29,6 @@ class Settings():
         # 外星人设置
         self.fleet_drop_speed = 25  # 向下移动的速度
 
-
         # 以什么样的速度加快游戏节奏
         self.speedup_scale = 1.1
 
