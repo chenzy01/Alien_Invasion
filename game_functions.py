@@ -84,7 +84,7 @@ def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_bu
     pygame.display.flip()  # 每次执行循环时都绘制一个空屏幕，并擦去旧屏幕
 
 
-def update_bullets(ai_settings, screen, ship, aliens, bullets):
+def update_bullets(ai_settings, screen, stats, sb, ship, aliens, bullets):
     """更新子弹的位置，并删除已消失的子弹"""
     bullets.update()  # 更新子弹位置
 
@@ -100,15 +100,19 @@ def update_bullets(ai_settings, screen, ship, aliens, bullets):
     参考：https://www.runoob.com/w3cnote/python-understanding-dict-copy-shallow-or-deep.html
     """
     # 检查子弹与外星人的碰撞
-    check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets)
+    check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets)
 
 
-def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets):
+def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets):
     """更新子弹的位置，并删除已消失的子弹"""
     # 检查是否有子弹击中了外星人，是将每颗子弹的rect同外星人的rect进行比较
     # 若击中，就删除相应的子弹和外星人
     # sprite.groupcollide 返回的是一个字典{"子弹":"外星人"}
     collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
+    if collisions:
+        for aliens in collisions.values():
+            stats.score += ai_settings.alien_points*len(aliens)  # 每次发生碰撞则记录一次
+            sb.prep_score()  # 更新记分
 
     if len(aliens) == 0:
         # 当外星人为空时，清空子弹,加快游戏节奏，并新建一群外星人

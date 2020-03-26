@@ -20,7 +20,9 @@ class Scoreboard():
 
     def prep_score(self):
         """将得分转换为一幅渲染的图像"""
-        score_str = str(self.stats.score)  # 将数字值 stats.score 装换为字符串
+        round_score = round(self.stats.score, -1)
+        score_str = "{:,}".format(round_score)  # 将数字值 stats.score 装换为字符串
+
         # 创建图像函数 font.render()
         self.score_image = self.font.render(score_str, True, self.text_color, self.ai_settings.bg_color)
         # 将得分放在屏幕右上角
