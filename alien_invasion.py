@@ -45,7 +45,7 @@ def run_game():
             # 更新子弹位置和删除未消失的子弹
             gf.update_bullets(ai_settings, screen, stats, sb, ship, aliens, bullets)
             # 检查外星人位置、移动外星人
-            gf.update_aliens(ai_settings, stats, screen, ship, aliens, bullets)
+            gf.update_aliens(ai_settings, screen, stats, sb, ship, aliens, bullets)
         # 每次循环重新绘制屏幕,让最近绘制的屏幕可见
         gf.update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_button)
 

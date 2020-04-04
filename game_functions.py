@@ -6,6 +6,20 @@ from bullet import Bullet
 from alien import Alien
 
 
+def check_events(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets):
+    # 监视键盘和鼠标事件
+    for event in pygame.event.get():  # 事件循环，来管理屏幕更新的代码
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            check_keydown_events(event, ai_settings, screen, ship, bullets)
+        elif event.type == pygame.KEYUP:
+            check_keyup_events(event, ship)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = pygame.mouse.get_pos()  # 返回一个元组，包含玩家单机时鼠标的x和y坐标
+            check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets, mouse_x, mouse_y)
+
+
 def check_keydown_events(event, ai_settings, screen, ship, bullets):
     """下面使用elif代码块，是因为每个事件都只与一个键关联
     """
@@ -28,20 +42,6 @@ def check_keyup_events(event, ship):
         ship.move_left = False
 
 
-def check_events(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets):
-    # 监视键盘和鼠标事件
-    for event in pygame.event.get():  # 事件循环，来管理屏幕更新的代码
-        if event.type == pygame.QUIT:
-            sys.exit()
-        elif event.type == pygame.KEYDOWN:
-            check_keydown_events(event, ai_settings, screen, ship, bullets)
-        elif event.type == pygame.KEYUP:
-            check_keyup_events(event, ship)
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_x, mouse_y = pygame.mouse.get_pos()  # 返回一个元组，包含玩家单机时鼠标的x和y坐标
-            check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets, mouse_x, mouse_y)
-
-
 def check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets, mouse_x, mouse_y):
     """在玩家点击 Play 按钮时开始游戏"""
     if play_button.rect.collidepoint(mouse_x, mouse_y):  # 检查点击时鼠标的坐标是否落在Play按钮rect内
@@ -60,6 +60,7 @@ def check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens,
             sb.prep_score()
             sb.prep_high_score()
             sb.prep_level()
+            sb.prep_ships()
 
             # 清空外星人和子弹列表
             aliens.empty()
@@ -202,7 +203,7 @@ def create_fleet(ai_settings, screen, ship, aliens):
             create_alien(ai_settings, screen, aliens, alien_number, row_number)
 
 
-def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
+def update_aliens(ai_settings, screen, stats, sb, ship, aliens, bullets):
     """检查是否有外星人处于屏幕边缘，更新外星人群中所有外星人的位置"""
     check_fleet_edges(ai_settings, aliens)
     aliens.update()
@@ -211,9 +212,9 @@ def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
     # spritecollideany()函数接受一个精灵和一个编组，遍历编组，找与精灵碰撞的成员，找到就返回该成员，找不到返回None
     if pygame.sprite.spritecollideany(ship, aliens):
         # print("Ship hit!!! GAME OVER")
-        ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+        ship_hit(ai_settings, screen, stats, sb, ship, aliens, bullets)
     # 检查是否有外星人到达屏幕底端
-    check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets)
+    check_aliens_bottom(ai_settings, screen, stats, sb, ship, aliens, bullets)
 
 
 def check_fleet_edges(ai_settings, aliens):
@@ -231,11 +232,15 @@ def change_fleet_direction(ai_settings, aliens):
     ai_settings.fleet_direction *= -1  # 方向标志位
 
 
-def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
+def ship_hit(ai_settings, screen, stats, sb, ship, aliens, bullets):
     """响应被外星人撞到的飞船"""
     if stats.ships_left > 0:
         # 将 ships_left 的值减1
         stats.ships_left -= 1
+
+        # 更新记分牌
+        sb.prep_ships()
+
         # 清空外星人列表和子弹列表
         aliens.empty()
         bullets.empty()
@@ -249,13 +254,13 @@ def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
         pygame.mouse.set_visible(True)
 
 
-def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
+def check_aliens_bottom(ai_settings, screen, stats, sb, ship, aliens, bullets):
     """检查是否有外星人到达了屏幕底端"""
     screen_rect = screen.get_rect()
     for alien in aliens.sprites():
         if alien.rect.bottom >= screen_rect.bottom:
             # 像飞船被撞到一样进行处理
-            ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+            ship_hit(ai_settings, screen, stats, sb, ship, aliens, bullets)
             break
 
 
