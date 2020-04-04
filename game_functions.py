@@ -28,7 +28,7 @@ def check_keyup_events(event, ship):
         ship.move_left = False
 
 
-def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets):
+def check_events(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets):
     # 监视键盘和鼠标事件
     for event in pygame.event.get():  # 事件循环，来管理屏幕更新的代码
         if event.type == pygame.QUIT:
@@ -39,10 +39,10 @@ def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets)
             check_keyup_events(event, ship)
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()  # 返回一个元组，包含玩家单机时鼠标的x和y坐标
-            check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y)
+            check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets, mouse_x, mouse_y)
 
 
-def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y):
+def check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets, mouse_x, mouse_y):
     """在玩家点击 Play 按钮时开始游戏"""
     if play_button.rect.collidepoint(mouse_x, mouse_y):  # 检查点击时鼠标的坐标是否落在Play按钮rect内
         button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
@@ -55,6 +55,11 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bul
             # 重置游戏统计信息
             stats.reset_stats()
             stats.game_active = True
+
+            # 重置记分牌图像
+            sb.prep_score()
+            sb.prep_high_score()
+            sb.prep_level()
 
             # 清空外星人和子弹列表
             aliens.empty()
@@ -113,11 +118,15 @@ def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, 
         for aliens in collisions.values():
             stats.score += ai_settings.alien_points*len(aliens)  # 每次发生碰撞则记录一次
             sb.prep_score()  # 更新记分
+        check_high_score(stats, sb)  # 检查最高得分
 
     if len(aliens) == 0:
-        # 当外星人为空时，清空子弹,加快游戏节奏，并新建一群外星人
+        # 当外星人为空时，清空子弹,加快游戏节奏,提高一个等级，并新建一群外星人
         bullets.empty()
         ai_settings.increase_speed()
+        # 提高等级
+        stats.level += 1
+        sb.prep_level()
         create_fleet(ai_settings, screen, ship, aliens)
 
 
@@ -248,6 +257,14 @@ def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
             # 像飞船被撞到一样进行处理
             ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
             break
+
+
+def check_high_score(stats, sb):
+    """检查是否诞生了最高得分"""
+    if stats.score > stats.high_score:
+        stats.high_score = stats.score
+        sb.prep_high_score()
+
 
 
 
